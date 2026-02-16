@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -8,13 +8,22 @@ import {
   useAnimations,
 } from "@react-three/drei";
 import * as THREE from "three";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Activated GSAP plugins
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const Hero = () => {
-  // Load the Model
+  // Model Loaded
   const { scene: modelScene, animations } = useGLTF("/models/dog.drc.glb");
 
+  // Create ref for the model
+  const dogModelRef = useRef();
+
   useThree(({ camera }) => {
-    camera.position.z = 0.48;
+    camera.position.z = 0.55;
   });
 
   // Model Animation
@@ -26,18 +35,59 @@ const Hero = () => {
     }
   }, [actions]);
 
-  // Load textures
-  const [normalMap, matcapTexture, branchesDiffuse, branchesNormal] = useTexture([
-    "/dog_normals.jpg",
-    "/matcap/mat-2.png",
-    "/models/branches_diffuse.jpg",
-    "/models/branches_normals.jpg",
-  ]).map((texture) => {
-    texture.flipY = false;
-    return texture;
-  });
+  // Textures Loaded
+  const [normalMap, matcapTexture, branchesDiffuse, branchesNormal] =
+    useTexture([
+      "/dog_normals.jpg",
+      "/matcap/mat-2.png",
+      "/models/branches_diffuse.jpg",
+      "/models/branches_normals.jpg",
+    ]).map((texture) => {
+      texture.flipY = false;
+      return texture;
+    });
 
-  // Apply material
+  // GSAP Animation
+  useGSAP(() => {
+    if (!dogModelRef.current) return; // Safety check
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#section-1",
+        endTrigger: "#section-3",
+        start: "top top",
+        end: "bottom bottom",
+        markers: true,
+        scrub: true,
+      },
+    });
+
+    tl.to(dogModelRef.current.position, {
+      z: "-=0.75",
+      y: "+=0.1",
+    })
+      .to(dogModelRef.current.rotation, {
+        x: `+=${Math.PI / 15}`,
+      })
+      .to(
+        dogModelRef.current.rotation,
+        {
+          y: `-=${Math.PI}`,
+        },
+        "third"
+      )
+      .to(
+        dogModelRef.current.position,
+        {
+          x: "-=0.5",
+          z: "+=0.6",
+          y: "-=0.05",
+        },
+        "third"
+      );
+  }, []);
+
+  // Material Applied
   useEffect(() => {
     const dogMaterial = new THREE.MeshMatcapMaterial({
       matcap: matcapTexture,
@@ -53,7 +103,6 @@ const Hero = () => {
       if (child.name.includes("DOG")) {
         child.material = dogMaterial;
       } else if (child.name.includes("BRANCH")) {
-        // Adjust this name to match your model
         child.material = branchMaterial;
       }
     });
@@ -68,6 +117,7 @@ const Hero = () => {
   return (
     <>
       <primitive
+        ref={dogModelRef}
         object={modelScene}
         position={[0.2, -0.6, 0]}
         rotation={[0, Math.PI / 5.8, 0]}
