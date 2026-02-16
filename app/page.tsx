@@ -21,9 +21,9 @@ export default function App() {
       >
         <Hero />
       </Canvas>
-      <section id="section_1"> Section 1</section>
-      <section id="section_2"> Section 2</section>
-      <section id="section_3"> Section 3</section>
+      <section id="section_1"> </section>
+      <section id="section_2"> </section>
+      <section id="section_3"> </section>
     </main>
   );
 };
