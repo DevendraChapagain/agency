@@ -6,7 +6,28 @@
 
 @font-face {
   font-family: "GTSectraDisplay";
-  src: url("/agency/public/fonts/GTSectraDisplay-Bold.woff2") format("woff2");
+src: url("/fonts/GTSectraDisplay-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Heebo";
+  src: url("/fonts/Heebo-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Heebo";
+  src: url("/fonts/Heebo-Thin.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Heebo";
+  src: url("/agency/public/fonts/Heebo-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
 }
 
 html,
@@ -110,4 +131,130 @@ h1 {
     font-family: hebbo, sans-serif;
   }
   }
+}
+
+#section_2 {
+  .titles {
+    display: flex;
+    flex-direction: column;
+    padding-inline: 6rem;
+    padding-top: 17rem;
+  }
+
+  .title {
+    display: flex;
+    align-items: flex-start;
+    gap: 5rem;
+    opacity: 0.3;
+    padding-block: 1.5rem;
+    transition: all 0.3s linear ;
+    cursor: pointer;
+   
+  }
+
+  .title:hover {
+    opacity: 1;
+  }
+  small {
+    min-width: 10rem;
+    margin-top: 0.9rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1rem;
+    text-transform: uppercase;
+    color: #BBC2E5;
+    text-align: right;
+  }
+  h1 {
+    flex: 1;
+    font-size: 5.25rem;
+    font-weight: 200;
+    line-height: 1;
+    font-family: "Heebo",sans-serif;
+    letter-spacing: -0.1rem;
+    text-align: left; 
+    color: #BBC2E5;
+  }
+}
+
+#canvas_wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+#canvas_wrapper::after {
+  content: "";
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  background-image: url("/background-xl.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: all 0.3s linear;
+}
+
+
+
+main:has(#section_2 .title:hover) #canvas_wrapper::after {
+  opacity: 0;
+}
+
+
+.images{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  top: 0;
+  left: 0;
+
+  img{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: all 0.3s linear;
+  }
+}
+
+main:has(#section_2 .title[img-title="tomorrowland"]:hover) .images #tomorrowland {
+  opacity: 1;
+  background-color: rgb(1, 12, 37);
+}
+
+main:has(#section_2 .title[img-title="navy-pier"]:hover) .images #navy-pier {
+  opacity: 1;
+  background-color: rgb(4, 9, 40);
+}
+
+main:has(#section_2 .title[img-title="msi-chicago"]:hover) .images #msi-chicago {
+  opacity: 1;
+  background-color: rgb(2, 17, 52);
+}
+
+main:has(#section_2 .title[img-title="this-was-louises-phone"]:hover) .images #this-was-louises-phone {
+  opacity: 1;
+  background-color: rgb(3, 25, 42);
+}
+
+main:has(#section_2 .title[img-title="kikk"]:hover) .images #kikk {
+  opacity: 1;
+  background-color: rgb(2, 19, 124);
+}
+
+main:has(#section_2 .title[img-title="the-kennnedy-center"]:hover) .images #the-kennnedy-center {
+  opacity: 1;
+  background-color: rgb(13, 39, 52);
+}
+
+main:has(#section_2 .title[img-title="royal-opera-of-willonia"]:hover) .images #royal-opera-of-willonia {
+  opacity: 1;
+  background-color: rgb(103, 1, 1);
 }

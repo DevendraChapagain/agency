@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 import { Canvas } from "@react-three/fiber";
 import Hero from "./components/hero";
@@ -6,21 +7,30 @@ import Hero from "./components/hero";
 export default function App() {
   return (
     <main>
-      <Canvas
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: 1,
-          backgroundImage: 'url("/background-xl.png")',
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-        }}
-      >
-        <Hero />
-      </Canvas>
+      <div className="images">
+  <img id="tomorrowland" src="/backgrounds/tomorrowland.png" alt="Tomorrowland" />
+  <img id="navy-pier" src="/backgrounds/navy-pier.png" alt="Navy Pier" />
+  <img id="msi-chicago" src="/backgrounds/msi-chicago.png" alt="MSI Chicago" />
+  <img id="this-was-louises-phone" src="/backgrounds/this-was-louises-phone.png" alt="This was Louises Phone" />
+  <img id="kikk" src="/backgrounds/kikk.png" alt="KIKK" />
+  <img id="the-kennnedy-center" src="/backgrounds/the-kennnedy-center.png" alt="The Kennedy Center" />
+  <img id="royal-opera-of-willonia" src="/backgrounds/orw.png" alt="ORW" />
+</div>
+      
+      <div id="canvas_wrapper">
+        <Canvas
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 1,
+          }}
+        >
+          <Hero />
+        </Canvas>
+      </div>
       <section id="section_1">
         <nav>
           <div className="nav_elem">
@@ -84,7 +94,38 @@ export default function App() {
           </div>
         </div>
       </section>
-      <section id="section_2"> </section>
+      <section id="section_2">
+        <div className="titles">
+          <div img-title="tomorrowland" className="title">
+            <small>2022 - Ongoing</small>
+            <h1>Tomorrowland</h1>
+          </div>
+          <div img-title="navy-pier" className="title">
+            <small>2018 - Ongoing</small>
+            <h1>Navy Piers</h1>
+          </div>
+          <div img-title="msi-chicago" className="title">
+            <small>2015 - Today</small>
+            <h1>MSI Chicago</h1>
+          </div>
+          <div img-title="this-was-louises-phone" className="title">
+            <small>2016</small>
+            <h1>This was Lousise's Phone</h1>
+          </div>
+          <div img-title="kikk" className="title">
+            <small>2012 - Today</small>
+            <h1>KIKK Festivals 2018</h1>
+          </div>
+          <div img-title="the-kennnedy-center" className="title">
+            <small>2017</small>
+            <h1>The Kenndy Center</h1>
+          </div>
+          <div img-title="royal-opera-of-willonia" className="title">
+            <small>2016 - Ongoing</small>
+            <h1>Royal Opera Of Willonia</h1>
+          </div>
+        </div>
+      </section>
       <section id="section_3"> </section>
     </main>
   );
