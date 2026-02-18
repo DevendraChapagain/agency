@@ -12,21 +12,17 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// Activated GSAP plugins
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const Hero = () => {
-  // Model Loaded
   const { scene: modelScene, animations } = useGLTF("/models/dog.drc.glb");
-
-  // Create ref for the model
   const dogModelRef = useRef();
+  const materialRef = useRef();
 
   useThree(({ camera }) => {
-    camera.position.z = 0.55;
+    camera.position.z = 0.42;
   });
 
-  // Model Animation
   const { actions } = useAnimations(animations, modelScene);
 
   useEffect(() => {
@@ -35,7 +31,7 @@ const Hero = () => {
     }
   }, [actions]);
 
-  // Textures Loaded
+  // Load textures
   const [normalMap, matcapTexture, branchesDiffuse, branchesNormal] =
     useTexture([
       "/dog_normals.jpg",
@@ -44,12 +40,102 @@ const Hero = () => {
       "/models/branches_normals.jpg",
     ]).map((texture) => {
       texture.flipY = false;
+      texture.colorSpace = THREE.SRGBColorSpace;
       return texture;
     });
 
-  // GSAP Animation
+  const matcaps = useTexture([
+    "/matcap/mat-1.png",
+    "/matcap/mat-2.png",
+    "/matcap/mat-3.png",
+    "/matcap/mat-4.png",
+    "/matcap/mat-5.png",
+    "/matcap/mat-6.png",
+    "/matcap/mat-7.png",
+    "/matcap/mat-8.png",
+    "/matcap/mat-9.png",
+    "/matcap/mat-10.png",
+    "/matcap/mat-11.png",
+    "/matcap/mat-12.png",
+    "/matcap/mat-13.png",
+    "/matcap/mat-14.png",
+    "/matcap/mat-15.png",
+    "/matcap/mat-16.png",
+    "/matcap/mat-17.png",
+    "/matcap/mat-18.png",
+    "/matcap/mat-19.png",
+    "/matcap/mat-20.png",
+  ]).map((texture) => {
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  });
+
+  // Apply materials with custom shader
+  useEffect(() => {
+    const dogMaterial = new THREE.MeshMatcapMaterial({
+      normalMap: normalMap,
+      matcap: matcaps[1],
+    });
+
+    dogMaterial.onBeforeCompile = (shader) => {
+      shader.uniforms.uMatcapTexture1 = { value: matcaps[18] };
+      shader.uniforms.uMatcapTexture2 = { value: matcaps[1] };
+      shader.uniforms.uProgress = { value: 1.0 };
+
+      materialRef.current = shader.uniforms;
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "void main() {",
+        `
+        uniform sampler2D uMatcapTexture1;
+        uniform sampler2D uMatcapTexture2;
+        uniform float uProgress;
+        void main() {
+        `,
+      );
+
+      shader.fragmentShader = shader.fragmentShader.replace(
+        "vec4 matcapColor = texture2D( matcap, uv );",
+        `
+        vec4 matcapColor1 = texture2D( uMatcapTexture1, uv );
+        vec4 matcapColor2 = texture2D( uMatcapTexture2, uv );
+        float transitionFactor = 0.2;
+        float progress = smoothstep(
+          uProgress - transitionFactor,
+          uProgress,
+          (vViewPosition.x + vViewPosition.y) * 0.5 + 0.5
+        );
+        vec4 matcapColor = mix(matcapColor2, matcapColor1, progress);
+        `,
+      );
+    };
+
+    dogMaterial.needsUpdate = true;
+
+    const branchMaterial = new THREE.MeshStandardMaterial({
+      map: branchesDiffuse,
+      normalMap: branchesNormal,
+    });
+
+    modelScene.traverse((child) => {
+      if (child.isMesh) {
+        if (child.name.includes("DOG")) {
+          child.material = dogMaterial;
+        } else if (child.name.includes("BRANCH")) {
+          child.material = branchMaterial;
+        }
+      }
+    });
+
+    return () => {
+      dogMaterial.dispose();
+      branchMaterial.dispose();
+    };
+  }, [modelScene, normalMap, matcaps, branchesDiffuse, branchesNormal]);
+
+  // GSAP scroll animation
   useGSAP(() => {
-    if (!dogModelRef.current) return; // Safety check
+    if (!dogModelRef.current) return;
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -74,7 +160,7 @@ const Hero = () => {
         {
           y: `-=${Math.PI}`,
         },
-        "third"
+        "third",
       )
       .to(
         dogModelRef.current.position,
@@ -83,36 +169,65 @@ const Hero = () => {
           z: "+=0.6",
           y: "-=0.05",
         },
-        "third"
+        "third",
       );
   }, []);
 
-  // Material Applied
+  // Hover events
   useEffect(() => {
-    const dogMaterial = new THREE.MeshMatcapMaterial({
-      matcap: matcapTexture,
-      normalMap: normalMap,
-    });
+    const changeMaterial = (matcap) => {
+      if (!materialRef.current) return;
 
-    const branchMaterial = new THREE.MeshStandardMaterial({
-      map: branchesDiffuse,
-      normalMap: branchesNormal,
-    });
+      materialRef.current.uMatcapTexture1.value = matcap;
 
-    modelScene.traverse((child) => {
-      if (child.name.includes("DOG")) {
-        child.material = dogMaterial;
-      } else if (child.name.includes("BRANCH")) {
-        child.material = branchMaterial;
+      gsap.to(materialRef.current.uProgress, {
+        value: 0.0,
+        duration: 0.3,
+        ease: "power2.inOut",
+        onComplete: () => {
+          materialRef.current.uMatcapTexture2.value = matcap;
+          materialRef.current.uProgress.value = 1.0;
+        },
+      });
+    };
+
+    const materialMap = {
+      tomorrowland: matcaps[18],
+      "navy-pier": matcaps[7],
+      "msi-chicago": matcaps[8],
+      "this-was-louises-phone": matcaps[11],
+      kikk: matcaps[9],
+      "the-kennnedy-center": matcaps[7],
+      "royal-opera-of-willonia": matcaps[12],
+    };
+
+    const listeners = [];
+
+    Object.entries(materialMap).forEach(([id, matcap]) => {
+      const element = document.querySelector(`[img-title="${id}"]`);
+      if (element) {
+        const handler = () => changeMaterial(matcap);
+        element.addEventListener("mouseenter", handler);
+        listeners.push({ element, handler });
       }
     });
 
-    // Cleanup
+    const titlesContainer = document.querySelector(".titles");
+    const resetHandler = () => changeMaterial(matcaps[1]);
+
+    if (titlesContainer) {
+      titlesContainer.addEventListener("mouseleave", resetHandler);
+    }
+
     return () => {
-      dogMaterial.dispose();
-      branchMaterial.dispose();
+      listeners.forEach(({ element, handler }) => {
+        element.removeEventListener("mouseenter", handler);
+      });
+      if (titlesContainer) {
+        titlesContainer.removeEventListener("mouseleave", resetHandler);
+      }
     };
-  }, [modelScene, normalMap, matcapTexture, branchesDiffuse, branchesNormal]);
+  }, [matcaps]);
 
   return (
     <>
